@@ -9,19 +9,44 @@ h1 {
     color: #EEEFF7;
   }
 
-.button, .projectbutton {
+.project {
+  margin-top: 50px;
+}
+
+.button {
     background-color: #7C838E;
     text-decoration:none;
     color: white;
-    padding: 15px 220px;
+    padding: 15px 100px;
     display: inline-block;
     font-size: 16px;
     border-radius: 10px;
+    border: solid #ABB5C4;
   }
-.button:hover, .projectbutton:hover {
+.button:hover {
     background-color: #7090C4;
 }
-.projectbutton{    
-    padding: 15px 75px;
+.projectbutton{   
+    margin-left: 40%;
+    margin-right: 40%;
+    margin-top: 1%; 
+    padding: 0% 0%;
     border-radius: 100px;
+}
+.gif:hover {
+  
+}
+
+.line {
+  border-bottom: 5px solid #ABB5C4;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  margin-left: 15%;
+  margin-right: 15%;
+  display: block;
+}
+
+img {
+  border-radius: 10%;
+  width: 10%;
 }
