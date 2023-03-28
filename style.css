@@ -16,8 +16,10 @@ h4 {
 .project {
   margin-top: 50px;
 }
-
-.button, .buttons{
+img {
+  border-radius: 10%;
+}
+.button{
     background-color: #7C838E;
     text-decoration:none;
     color: white;
@@ -26,19 +28,24 @@ h4 {
     font-size: 16px;
     border-radius: 10px;
     border: solid #ABB5C4;
+    clear:both;
   }
-.buttons {
-  margin-top: 1%;
-  margin-left: 20%;
-  margin-right: 20%;
-}
 .button:hover{
     background-color: #7090C4;
 }
-.projectbutton{   
-    margin: 3%;
-    padding: 0% 0%;
-    border-radius: 100px;
+
+.projectIMG > a > img{
+  margin-bottom: 4%;
+  width: 35%;
+  display:inline;
+  margin-left: 2%;
+  margin-right: 2%;
+  background-color: #7C838E;
+  text-decoration:none;
+  color: white;
+  border-radius: 5%;
+  font-size: 16px;
+  border: solid #ABB5C4;
 }
 
 .line {
@@ -50,21 +57,56 @@ h4 {
   display: block;
 }
 
-img {
+.gif {
   border-radius: 20%;
-  width: 30%;
+  width: 50%;
+  margin-bottom: 5%;
 }
 
 .Sil {
-  width: 10%;
+  border-radius: 20%;
+  width: 8%;
 }
 
 .gif:hover {
-  content: url(Spacepus.gif);
+  content: url(Images/Spacepus.gif);
 }
 
 p {
   margin-top: 30px;
   margin-left: 20%;
   margin-right: 20%;
+}
+footer{
+  background-color: #ABB5C4;
+  position:fixed;
+  left:0px;
+  bottom:0px;
+  height: 80px;
+  width:100%;
+}
+.Footer{
+  display: inline;
+  margin-right: 4%;
+}
+.Footer > a{
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  vertical-align: middle;
+  margin-left: 20px;
+  border-radius: 20px;
+}
+.Footer > h3{
+  font-size: 30px;
+  line-height: 80px;
+  color: #7C838E;
+  display: inline;
+}
+.Footer> a > img{
+  width: 100px;
+}
+.Footer > a > img:hover{
+  transition: 0.1s;
+  filter:opacity(30%);
 }
