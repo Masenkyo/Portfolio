@@ -33,7 +33,9 @@ img {
 .button:hover{
     background-color: #7090C4;
 }
-
+.projectIMG {
+  margin-bottom: 5%;
+}
 .projectIMG > a > img{
   margin-bottom: 4%;
   width: 35%;
@@ -58,14 +60,21 @@ img {
 }
 
 .gif {
-  border-radius: 20%;
+  border-radius: 5%;
   width: 50%;
-  margin-bottom: 5%;
+}
+
+.size > img{
+  width:100px;
+  display:block;
+  margin-bottom: 10%;
+  margin-left: 47.2%;
 }
 
 .Sil {
   border-radius: 20%;
   width: 8%;
+  margin-bottom: 5%;
 }
 
 .gif:hover {
