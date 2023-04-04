@@ -39,6 +39,7 @@ img {
 .projectIMG > a > img{
   margin-bottom: 4%;
   width: 35%;
+  max-height: 1%;
   display:inline;
   margin-left: 2%;
   margin-right: 2%;
