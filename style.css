@@ -120,3 +120,6 @@ footer{
   transition: 0.1s;
   filter:opacity(30%);
 }
+.smaller {
+  margin-inline: 30%;;
+}
