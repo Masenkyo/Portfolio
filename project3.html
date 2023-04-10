@@ -17,9 +17,124 @@
     <h3>
         1 Game Developer
     </h3>
+    <p class="smaller" >
+        Inleiding
+        <br>
+        <br>
+        Toen de eerste jaar van school voorbij was, had ik in de zomervakantie zin om een game te maken. Dus ik begon een 2D Adventure/Combat game te maken.
+        Ik ben van plan om verschillende characters te maken die allemaal verschillende attacks hebben en dan kan je tegen elkaar vechten.
+        <br>
+        <br>
+        <br>
+        <br>
+        Uitleg
+        <br>
+        <br>
+        Er is dan bijvoorbeeld een gamemode dat heet Adventure en 1 die heet Multiplayer, dan kan je kiezen wat voor multiplayer wilt doen (1v1, 2v2, 4v4, co-op Adventure).
+        <br>
+        <br>
+        A-D is voor links en rechts bewegen, S is voor sneller vallen en W is voor de jump. Ik heb ook een Hold Jump gemaakt voor mijn Input Output school project, dus misschien
+        kan ik zoiets ook toevoegen aan mijn game.
+        <br>
+        <br>
+        Voor nu als je spatie in klikt dan kan je slaan met je Scythe, ik heb nog niet meerdere attacks of characters gemaakt, want het project is voor nu on-hold omdat ik het
+        best druk heb met school.
+        <br>
+        <br>
+        Je kan ik de game voor nu alleen rond lopen, springen en een enemy killen. Ook is er in het begin als je spawnt een muur dat je wilt doden.
+        <br>
+        <br>
+    </p>
     <a class="size" href="https://github.com/Masenkyo/Explores" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <div class="Code"> <h3> Movement Script</h3>
+        <div>
+            <pre>public class Movement : MonoBehaviour
+                {
+    public Transform groundCheck;
+    bool grounded = false;
+    private Animator An;
+    private BoxCollider2D Attack1Hitbox;
+    private Rigidbody2D player;
+    private float Speed = 6f;
+    private float JumpSpeed = 12f;
+    private float DownSpeed = 0.03f;
+    private void Start()
+    {
+        player = GetComponent<Rigidbody2D>();
+        An = GetComponent<Animator>();
+    }
+    void Update()
+    {
+        grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            player.velocity = new Vector2(-Speed, player.velocity.y);
+        }
+        else if (player.velocity.x < 0)
+        {
+            player.velocity = new Vector2(player.velocity.x / ((10f * Time.deltaTime) + 1f), player.velocity.y);
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            player.velocity = new Vector2(Speed, player.velocity.y);
+        }
+        else if (player.velocity.x > 0)
+        {
+            player.velocity = new Vector2(player.velocity.x / ((10f * Time.deltaTime) + 1f), player.velocity.y);
+        }
+        if (Input.GetKey(KeyCode.A) && (Input.GetKey(KeyCode.D)))
+        {
+            player.velocity = new Vector2(0, player.velocity.y);
+        }
+        if (grounded == false && Input.GetKey(KeyCode.S))
+        {
+            player.velocity -= new Vector2(0, DownSpeed);
+        }
+        if ((Input.GetKeyDown(KeyCode.W))&&(grounded))
+        {
+            player.velocity = new Vector2(player.velocity.x, JumpSpeed);
+            grounded = false;
+        }
+        if (player.velocity.x > 0.5 || player.velocity.y > 0.5 || player.velocity.x < -0.5 || player.velocity.y < -0.5)
+        {
+            An.SetBool("isRunning", true);
+        }
+        else An.SetBool("isRunning", false);
+        if (player.velocity.x < -0.1)
+        {
+            transform.localScale = new Vector3(-2.5f, transform.localScale.y, 2.5f);
+        }
+        if (player.velocity.x > 0.1)
+        {
+            transform.localScale = new Vector3(2.5f, transform.localScale.y, 2.5f);
+        }
+        if (player.velocity.y == 0)
+        {
+            An.SetBool("isJumping", false);
+            An.SetBool("isFalling", false);
+        }
+        if (player.velocity.y > 0)
+        {
+            An.SetBool("isJumping", true);
+            An.SetBool("isFalling", false);
+        }
+        if (player.velocity.y < 0)
+        {
+            An.SetBool("isJumping", false);
+            An.SetBool("isFalling", true);
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            An.SetTrigger("isAttacking");
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
 </body>
 <footer>
     <article class="Footer">
