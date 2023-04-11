@@ -99,12 +99,12 @@ footer{
 }
 .Footer{
   display: inline;
-  margin-right: 4%;
+  margin-right: 70px;
 }
 .Footer > a{
   display: inline-block;
   width: 70px;
-  height: 70px;
+  height: 68px;
   vertical-align: middle;
   margin-left: 20px;
   border-radius: 20px;
