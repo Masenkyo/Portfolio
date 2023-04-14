@@ -29,6 +29,7 @@ img {
     border-radius: 10px;
     border: solid #ABB5C4;
     clear:both;
+    width:100px;
   }
 .button:hover{
     background-color: #7090C4;
@@ -38,8 +39,7 @@ img {
 }
 .projectIMG > a > img{
   margin-bottom: 4%;
-  width: 35%;
-  max-height: 1%;
+  width:30%;
   display:inline;
   margin-left: 2%;
   margin-right: 2%;
@@ -49,6 +49,7 @@ img {
   border-radius: 20px;
   font-size: 16px;
   border: solid #ABB5C4;
+  image-rendering: pixelated;
 }
 
 .line {
