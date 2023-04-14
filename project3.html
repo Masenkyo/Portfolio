@@ -49,6 +49,15 @@
     <a class="size" href="https://github.com/Masenkyo/Explores" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <p class="smaller">
+        De movement script zorgt ervoor dat je rond kan bewegen, je kan springen en sneller vallen.
+        <br>
+        De script checkt of de player grounded is met een groundcheck.
+        <br>
+        Animaties worden voor nu op een lelijke manier geregelt, maar ik weet al hoe ik dat ga doen.
+        <br>
+        Het regelt de animaties van idle, jump, fall, run en attack.
+    </p>
     <div class="Code"> <h3> Movement Script</h3>
         <div>
             <pre>public class Movement : MonoBehaviour
@@ -131,6 +140,132 @@
         {
             An.SetTrigger("isAttacking");
         }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <div class="Code"> <h3>Damage Script</h3>
+        <div>
+            <pre>public class AttackArea : MonoBehaviour
+{
+    private int damage = 1;
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if(collider.GetComponent<Health>() != null)
+        {
+            Health health = collider.GetComponent<Health>();
+            health.Damage(damage);
+        }if(collider.GetComponent<HealthEnemy>() != null)
+        {
+            HealthEnemy health = collider.GetComponent<HealthEnemy>();
+            health.Damage(damage);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <div class="Code"> <h3>Health Script</h3>
+        <div>
+            <pre>public class Health : MonoBehaviour
+{
+    [SerializeField] private int health = 100;
+
+    private int MAX_HEALTH = 100;
+
+    private GameObject player;
+
+    void Update()
+    {
+        
+    }
+
+    public void Damage(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new System.ArgumentOutOfRangeException("Cannot have negative Damage");
+        }
+
+        this.health -= amount;
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void Heal(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new System.ArgumentOutOfRangeException("Cannot have negative Healing");
+        }
+
+        bool wouldBeOverMaxHealth = health + amount > MAX_HEALTH;
+
+        if (wouldBeOverMaxHealth)
+        {
+            this.health = MAX_HEALTH;
+        }
+        else
+        {
+            this.health += amount;
+        }
+    }
+    
+    private void Die()
+    {
+        Debug.Log("I am Dead!");
+        Destroy(gameObject);
+        SceneManager.LoadScene("Death");
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <div class="Code"> <h3>PlayerAttack Script</h3>
+        <div>
+            <pre>public class PlayerAttack : MonoBehaviour
+{
+    private GameObject AttackArea = default;
+
+    private bool attacking = false;
+
+    private float timeToAttack = 0.25f;
+    private float timer = 0f;
+
+    void Start()
+    {
+        AttackArea = transform.GetChild(0).gameObject;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Attack();
+        }
+
+        if(attacking)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= timeToAttack)
+            {
+                timer = 0;
+                attacking = false;
+                AttackArea.SetActive(attacking);
+            }
+        }
+    }
+
+    private void Attack()
+    {
+        attacking = true;
+        AttackArea.SetActive(attacking);
     }
 }
             </pre>

@@ -16,6 +16,9 @@
         <source src="Images/Spacepusvid.mp4" type="video/mp4">
     </video>
     <h3>
+        Mijn eerste echte gameproject, ik wist nog niet zoveel over game dev.
+        <br>
+        <br>
         2 Game Developers
         <br>
         <br>
@@ -58,6 +61,17 @@
     <a class="size" href="https://github.com/Masenkyo/Spacepus" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <p class="smaller">
+        Ik heb de movement, energy, bullet, sonicboom, audio en camerashake gemaakt in deze script.
+        <br>
+        De movement is gewoon links, rechts, naarboven, naarbeneden.
+        <br>
+        Energy telt elke seconde op, en bullet cost 1 energy om te schieten, maar sonic boom 15 energy.
+        <br>
+        De audio speelt af als je 1 van de knoppen inklikt, en per ding dat je doet komt een ander geluidje. Bijv. bij bullet een bullet schot en bij sonicboom een knal.
+        <br>
+        De camerashake speelt af als je dmg krijgt.
+    </p>
     <div class="Code"> <h3>Movement Script <br> And a few things like audio, camerashake, collisions</h3>
         <div>
             <pre>public class walking : MonoBehaviour
@@ -240,6 +254,681 @@
             {
                 shield = false;
             }
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat als de boss 0 hp heeft dan ga je naar de end scene.
+        <br>
+        Als de boss gehit word door sonicboom, dan krijgt hij 1 damage.
+    </p>
+    <div class="Code"> <h3>Boss Damage Script</h3>
+        <div>
+            <pre>public class boss : MonoBehaviour
+{
+    int attacktype;
+    public int hp;
+    bool inattack;
+    
+    void Update()
+    {
+        if (hp == 0)
+        {
+            SceneManager.LoadScene("end");
+        }
+
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "SAnicBoom(Clone)")
+        {
+            if (!inattack)
+            {
+                hp = hp - 1;
+            }
+            
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de boss om de zoveel seconde inkt schiet naar de players locatie.
+        <br>
+        Het inkt kan gedestroyed worden door een sonicboom.
+    </p>
+    <div class="Code"> <h3>Bossink Script</h3>
+        <div>
+            <pre>public class bossink : MonoBehaviour
+{
+    private Vector3 directie;
+    public Vector3 player;
+    GameObject boss;
+    float speed = 8f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform.position;
+        directie = (player - transform.position).normalized * Time.deltaTime;
+        Destroy(gameObject, 5f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position = new Vector3 (transform.position.x, transform.position.y, -5);
+        transform.position += directie * speed;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "player" || collision.collider.name == "SAnicBoom(Clone)")
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt voor meerdere dingen, hij zorgt ervoor dat de boss een meteoor gooit over een random time en snelheid.
+        <br>
+        Als de boss word gehit dan shaked hij een beetje.
+        <br>
+        Als de boss een meteoor gooit, dan gaat zijn I-frames weg en dan kan je hem hitten met een sonicboom, en niet met een bullet, want die zijn te slap.
+    </p>
+    <div class="Code"> <h3>Bosss Script</h3> <h4>Ik heb deze script niet deze naam gegeven</h4>
+        <div>
+            <pre>public class bosss : MonoBehaviour
+{
+    public AudioClip hitsound;
+    private Vector3 magnitude = new Vector3(0, 0.03f, 0);
+    public bool shake;
+    public int shaketimes;
+    int framedelay;
+    float lasttime;
+    float meteortime = 5;
+    public GameObject bossink;
+    public GameObject meteor;
+    public GameObject bossbar;
+    public GameObject bossdeath;
+    float Posx;
+    float Posy;
+    public int hp;
+    bool inattack;
+    int meteorchance;
+    public Sprite nohit;
+    public Sprite canhit;
+    public bool hit;
+    private RandomOcto _RandomOcto;
+    public AudioClip deathsound;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        lasttime = 0;
+        Instantiate(bossbar, GameObject.Find("Canvas").transform);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (shaketimes <= 4)
+        {
+            if (framedelay == 4)
+            {
+                framedelay = 0;
+                if (shake)
+                {
+                    gameObject.transform.position += magnitude;
+                    shake = false;
+                }
+                else
+                {
+                    gameObject.transform.position -= magnitude;
+                    shake = true;
+                    shaketimes++;
+
+                }
+
+            }
+            else
+            {
+                framedelay++;
+            }
+        }
+
+        lasttime += Time.deltaTime;
+        Posx = transform.position.x;
+        Posy = transform.position.y;
+        if (lasttime > 2 && hp != 0)
+        {
+            Instantiate(bossink, new Vector3(Posx, Posy, -5), Quaternion.identity);
+            lasttime = 0;
+        }
+        meteortime += Time.deltaTime;
+        if (meteortime > 10 && hp != 0)
+        {
+            meteorchance = Random.Range(2, 4);
+            if (meteorchance == 2)
+            {
+                Instantiate(meteor, new Vector3(Posx, -6, -5), Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(meteor, new Vector3(Posx, 6, -5), Quaternion.identity);
+            }
+            
+            meteortime = 0;
+        }
+        if (meteortime == 0)
+        {
+            //gameObject.GetComponent<Image>().sprite = canhit;
+            //GetComponentInChildren<Image>().sprite = canhit;
+            hit = true;
+        }
+
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "SAnicBoom(Clone)")
+        {
+            if (!inattack && hit)
+            {
+                AudioSource.PlayClipAtPoint(hitsound, new Vector3(0, 0, -10));
+                hp = hp - 1;
+                shaketimes = 0;
+                hit = false;
+                if (hp == 0)
+                {
+                    AudioSource.PlayClipAtPoint(deathsound, new Vector3(0, 0, -10));
+                    Instantiate(bossdeath, new Vector3(Posx-1, Posy, -5), Quaternion.identity);
+                    Destroy(gameObject);
+
+                }
+            }
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script schiet een bullet naarvoren en als hij een enemy hit, dan killed hij die enemy en dan disappeared de bullet over een halve seconde.
+        <br>
+        Als de bullet niks raakt, heeft hij een totale lifespan van 2 seconden.
+    </p>
+    <div class="Code"> <h3>Bullet Script</h3>
+        <div>
+            <pre>public class bullet : MonoBehaviour
+{
+    GameObject player;
+    float speed = 10f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        player = GameObject.Find("player");
+        transform.position = player.transform.position;
+        Destroy(gameObject, 2.01f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += new Vector3(speed, 0, 0) * Time.deltaTime;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "rots(Clone)" || collision.collider.name == "snelrots(Clone)" || collision.collider.name == "schietrots(Clone)")
+        {
+            Destroy(gameObject,0.5f);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat je de camera kan shaken voor een kleine tijd, voor bijvoorbeeld gehit worden door een enemy.
+    </p>
+    <div class="Code"> <h3>CameraShake Script</h3>
+        <div>
+            <pre>public class CameraShake : MonoBehaviour
+{
+    private Vector3 magnitude = new Vector3(0, 0.03f, 0);
+    public bool shake;
+    public int shaketimes;
+    int framedelay;
+
+    void Update()
+    {
+        if (shaketimes <= 4)
+        {
+            if (framedelay == 4)
+            {
+                framedelay = 0;
+                if (shake)
+                {
+                    gameObject.transform.position += magnitude;
+                    shake = false;
+                }
+                else
+                {
+                    gameObject.transform.position -= magnitude;
+                    shake = true;
+                    shaketimes++;
+                }
+                
+            }
+            else
+            {
+                framedelay++;
+            }
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script regelt de energy zodat het niet over de max heen kan en dat het optelt bij de bar.
+    </p>
+    <div class="Code"> <h3>Energybar Script</h3>
+        <div>
+            <pre>public class enbars : MonoBehaviour
+{
+    public Slider enbar;
+    private int maxen = 100;
+    private walking _walking;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        enbar.maxValue = maxen;
+        _walking = GameObject.Find("player").GetComponent<walking>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        enbar.value = _walking.en;
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat het inkt dat de slome spacepus schiet naarvoren gaat en damage doet.
+    </p>
+    <div class="Code"> <h3>Ink Script</h3>
+        <div>
+            <pre>public class ink : MonoBehaviour
+{
+    float speed = 10f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        Destroy(gameObject,5f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += new Vector3(-speed, 0, 0) * Time.deltaTime;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "player" || collision.collider.name == "SAnicBoom(Clone)")
+        {
+            Destroy(gameObject);
+        }    
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de meteoor richting de player toe gaat, en als de meteoor word geraakt door een sonic boom, dan word hij gedestroyed.
+    </p>
+    <div class="Code"> <h3>Meteoor Script</h3>
+        <div>
+            <pre>public class metoerscript : MonoBehaviour
+{
+    private Vector3 directie;
+    public Vector3 player;
+    GameObject boss;
+    float speed = 8f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform.position;
+        directie = (player - transform.position).normalized * Time.deltaTime;
+        Destroy(gameObject, 5f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position = new Vector3(transform.position.x, transform.position.y, -5);
+        transform.position += directie * speed;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "player" || collision.collider.name == "SAnicBoom(Clone)")
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de spacepus' spawnen op random tijden en locaties.
+        <br>
+        Hoe langer je in de game zit hoe meer verschillende soorten spacepus' er komen.
+        <br>
+        In het begin krijg je normale, na 20 seconden snellere spacepus' en na 50 seconden komen er slome spacepus' die inkt schieten recht naarvoren.
+        <br>
+        De boss spawnt na anderhalve minuut en dan spawnen de normale spacepus' niet meer, want anders zijn er teveel spacepus' op het scherm en zal je sterven.
+    </p>
+    <div class="Code"> <h3>Spacepus Spawn Script</h3>
+        <div>
+            <pre>public class RandomOcto : MonoBehaviour
+{
+    public GameObject rots;
+    public GameObject snelrots;
+    public GameObject schietrots;
+    public GameObject boss;
+    private bosss _boss;
+
+    public float gametime;
+    int niks = 0;
+
+    float rotstimer;
+    float rotsdelay;
+
+    float snelrotstimer;
+    float snelrotsdelay;
+
+    float schietrotstimer;
+    float schietrotsdelay;
+
+    public float bossdeathtimer;
+
+    public bool noboss = false;
+    public bool enemy = true;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        gametime += Time.deltaTime;
+
+        if (gametime > 1 && gametime < 90)
+        {
+            rotstimer += Time.deltaTime;
+            if (rotstimer > rotsdelay)
+            {
+                Instantiate(rots);
+                rotstimer = 0.0f;
+                rotsdelay = Random.Range(0.5f, 1.2f);
+            }
+        }
+            
+
+        if (gametime > 20)
+        {
+            snelrotstimer += Time.deltaTime;
+            if (snelrotstimer > snelrotsdelay)
+            {
+                Instantiate(snelrots);
+                snelrotstimer = 0.0f;
+                snelrotsdelay = Random.Range(2.0f, 6.0f);
+            }
+        }
+
+        if (gametime > 50)
+        {
+            schietrotstimer += Time.deltaTime;
+            if (schietrotstimer > schietrotsdelay)
+            {
+                Instantiate(schietrots);
+                schietrotstimer = 0.0f;
+                schietrotsdelay = Random.Range(8.0f, 12.0f);
+            }
+        }
+
+        if (gametime > 90 && !noboss)
+        {
+            GameObject goBoss = Instantiate(boss);
+            _boss = goBoss.GetComponent<bosss>();
+            noboss = true;
+
+        }
+
+        if (bossdeathtimer > 1.5f)
+        {
+            SceneManager.LoadScene("end");
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            gametime = 90;
+        }
+        if (noboss)
+        {
+            if (_boss.hp == 0)
+            {
+                bossdeathtimer = bossdeathtimer + Time.deltaTime;
+                enemy = false;
+
+            }
+        }
+
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de sonicboom spawnt als je op de knop klikt.
+        <br>
+        De sonicboom kost 15 energy en gaat recht naarvoren, hij begint klein, maar hij word overtime steeds groter en groter, als een soort van shockwave.
+        <br>
+        De sonicboom gaat na anderhalve seconde weg en als hij is de enige dat de boss kan raken.
+    </p>
+    <div class="Code"> <h3>SonicBoom Script</h3>
+        <div>
+            <pre>public class SAnicBoom : MonoBehaviour
+{
+    GameObject player;
+    float speed = 7f;
+    float Grote = 0.15f;
+    void Start()
+    {
+        player = GameObject.Find("player");
+        transform.position = player.transform.position;
+        Destroy(gameObject, 1.5f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += new Vector3(speed, 0, 0) * Time.deltaTime;
+        transform.localScale = new Vector3(Grote, Grote, Grote);
+        Grote += Grote * Time.deltaTime;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "boss(Clone)" || collision.collider.name == "boss")
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Net als bij de HPbar script kan deze veel beter, maar ik zat pas in de 1ste en dit was mijn eerste project van een game maken met iemand anders.
+        <br>
+        Deze script zorgt ervoor dat de sprite veranderd met hoeveel speedtime je nog over hebt.
+    </p>
+    <div class="Code"> <h3>Speedbar Script</h3>
+        <div>
+            <pre>public class speedbar : MonoBehaviour
+                {
+                    private walking _walking;
+                
+                    public Sprite speed0;
+                    public Sprite speed1;
+                    public Sprite speed2;
+                    public Sprite speed3;
+                    public Sprite speed4;
+                    public Sprite speed5;
+                    public Sprite speed6;
+                    public Sprite speed7;
+                    public Sprite speed8;
+                    public Sprite speed9;
+                    public Sprite speed10;
+                    public Sprite speed11;
+                    public Sprite speed12;
+                    public Sprite speed13;
+                    public Sprite speed14;
+                    public Sprite speed15;
+                    
+                    // Start is called before the first frame update
+                    void Start()
+                    {
+                        _walking = GameObject.Find("player").GetComponent<walking>();
+                    }
+                
+                    // Update is called once per frame
+                    void Update()
+                    {
+                        if (_walking.speedtime == 0)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed0;
+                        }
+                        else if (_walking.speedtime < 1)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed1;
+                        }
+                        else if (_walking.speedtime < 2)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed2;
+                        }
+                        else if (_walking.speedtime < 3)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed3;
+                        }
+                        else if (_walking.speedtime < 4)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed4;
+                        }
+                        else if (_walking.speedtime < 5)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed5;
+                        }
+                        else if (_walking.speedtime < 6)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed6;
+                        }
+                        else if (_walking.speedtime < 7)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed7;
+                        }
+                        else if (_walking.speedtime < 8)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed8;
+                        }
+                        else if (_walking.speedtime < 9)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed9;
+                        }
+                        else if (_walking.speedtime < 10)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed10;
+                        }
+                        else if (_walking.speedtime < 11)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed11;
+                        }
+                        else if (_walking.speedtime < 12)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed12;
+                        }
+                        else if (_walking.speedtime < 13)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed13;
+                        }
+                        else if (_walking.speedtime < 14)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed14;
+                        }
+                        else if (_walking.speedtime < 15)
+                        {
+                            gameObject.GetComponent<Image>().sprite = speed15;
+                        }
+                    }
+                }
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat er elke keer als je een spacepus killed dat je een kans hebt op een powerup.
+        <br>
+        Er zijn 4 verschillende powerups zoals hp, energy, speed, en shield later in de game.
+        <br>
+        HP powerup geeft je 1 meer hp.
+        <br>
+        ENERGY geeft je 20 meer energy.
+        <br>
+        SPEED maakt je sneller voor een bepaalde tijd.
+        <br>
+        SHIELD geeft je een protection layer dat 1 hit kan tanken voor je.
+    </p>
+    <div class="Code"> <h3>PowerUP Script</h3>
+        <div>
+            <pre>public class PowerUP : MonoBehaviour
+{
+
+    float speed = 1f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+        float start = Random.Range(-8.0f, 8.0f);
+        transform.position = new Vector3(start, 6, -5);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += new Vector3(0, -speed, 0) * Time.deltaTime;
+        if (transform.position.y < -7)
+        {
+
+            Destroy(gameObject);
+
+        }
+
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.name == "player")
+        {
+            Destroy(gameObject);
         }
     }
 }
