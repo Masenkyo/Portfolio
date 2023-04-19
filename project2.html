@@ -52,71 +52,433 @@
     <a class="size" href="https://github.com/Masenkyo/Magifencee/tree/master" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <p class="smaller">
+        Deze script regelt het plaatsen van alle towers.
+        <br>
+        Als je op een knop klikt dan gebruikt hij 1 van de functies en kijkt of je genoeg geld hebt of niet, daarna volgt de toren je muis totdat je hem hebt geplaatst of weg heb gezet.
+        <br>
+        De script checkt als je klikt of hij hem kan plaatsen, hij kan hem alleen plaatsen op 2 verschillende tiles, en die zijn grass en donkere grass.
+        <br>
+        Als er een toren staat op de plek waar je hem wilt plaatsen kan dat niet en blijft hij je muis volgen.
+        <br>
+        Ook als hij je muis aan het volgen is zie je de range van de tower, en als je hem plaatst zie je de range niet meer.
+        <br>
+        Er is een knop dat ervoor zorgt dat je de toren kan draaien, dat is handig voor de kannon, want die kan maar 1 kant op schieten.
+    </p>
     <div class="Code"> <h3>TowerPlace Script</h3>
         <div>
             <pre>public class TowerPlace : MonoBehaviour
 {
+    public GameObject SpawnRange;
+    public GameObject Range;
+    public GameObject RangeFire;
+    public GameObject RangeLightning;
+    public GameObject RangeWater;
     public GameObject NormalTower;
+    public GameObject LightningTower;
+    public GameObject WaterTower;
+    public GameObject FireTower;
     public GameObject Tower;
-    bool CanPlace = true;
-    private GameObject Variable;
+    public Tilemap tilemap;
+    public TileBase Gras;
+    public TileBase Grass;
+    public int Cost;
     private Camera cam => Camera.main.GetComponent<Camera>();
     Vector3 mousepos => new Vector3((Mathf.Floor(cam.ScreenToWorldPoint(Input.mousePosition).x)) + 0.5f, (Mathf.Floor(cam.ScreenToWorldPoint(Input.mousePosition).y)) + 0.5f, 0);
-
-    void Start()
+    GameObject[] Towers;
+    [SerializeField]
+    bool CanPlace()
     {
-
-    }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        
-        if (other.gameObject.CompareTag("Tower"))
+        foreach (GameObject T in Towers)
         {
-            
-            
-            CanPlace = false;
-            
-        }       
-    }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        
-        if (other.gameObject.CompareTag("Tower"))
-        {
-            
-            CanPlace = true;
-            
+            if (T.CompareTag("Tower") && T != Tower && T.transform.position == Tower.transform.position)
+                return false;
+
         }
+        return true;
     }
-
+    private void Start()
+    {
+        
+    }
     void Update()
     {
         if (Tower != null)
-            Tower.transform.position = mousepos;
-        if (Input.GetMouseButtonDown(0))
         {
-            if (CanPlace == true)
+            Tower.transform.position = mousepos;
+            SpawnRange.transform.position = mousepos;
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log("I Believe");
-                GetComponent<Collider2D>().isTrigger = false;
-                Tower = null;
+                Tower.transform.Rotate(0, 0, -90);
+                SpawnRange.transform.Rotate(0, 0, -90);
+            }         
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                Tower.transform.Rotate(0, 0, 90);
+                SpawnRange.transform.Rotate(0, 0, 90);
             }
-            if (CanPlace == false)
+        }        
+        Towers = GameObject.FindObjectsOfType<GameObject>();
+        if (Input.GetMouseButtonDown(0) && Tower != null && CanPlace() && tilemap.GetTile(tilemap.WorldToCell(mousepos)) == Gras)
+        {
+            Tower.GetComponent<NormalShoot>().enabled = true;
+            Tower = null;
+            Destroy(SpawnRange);
+            
+        }
+        else if (Input.GetMouseButtonDown(0) && Tower != null && CanPlace() && tilemap.GetTile(tilemap.WorldToCell(mousepos)) == Grass)
+        {
+            Tower.GetComponent<NormalShoot>().enabled = true;
+            Tower = null;
+            Destroy(SpawnRange);
+            
+        }
+        if (Input.GetKeyDown(KeyCode.Backspace) && Tower != null)
+        {
+            Destroy(Tower);
+            Destroy(SpawnRange);
+            GameObject.Find("Canvas").GetComponent<Points>().points += Cost;
+        }
+    }
+    public void NormalTowerCannon()
+    {
+        
+        if (Tower != null && GameObject.Find("Canvas").GetComponent<Points>().points >= 50)
+        {
+            GameObject.Find("Canvas").GetComponent<Points>().AddPoints(Cost);
+            Cost = 50;
+            Destroy(Tower);
+            Destroy(SpawnRange);
+            Tower = Instantiate(NormalTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(Range, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+        if (Tower == null && GameObject.Find("Canvas").GetComponent<Points>().points >= 50)
+        {
+            Cost = 50;
+            Tower = Instantiate(NormalTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(Range, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }            
+    }
+    public void LightningTowerTesla()
+    {
+
+        if (Tower != null && GameObject.Find("Canvas").GetComponent<Points>().points >= 150)
+        {
+            GameObject.Find("Canvas").GetComponent<Points>().AddPoints(Cost);
+            Cost = 150;
+            Destroy(Tower);
+            Destroy(SpawnRange);
+            Tower = Instantiate(LightningTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeLightning, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+
+        if (Tower == null && GameObject.Find("Canvas").GetComponent<Points>().points >= 150)
+        {
+            Cost = 150;
+            Tower = Instantiate(LightningTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeLightning, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+    }
+    public void WaterTowerTesla()
+    {
+
+        if (Tower != null && GameObject.Find("Canvas").GetComponent<Points>().points >= 300)
+        {
+            GameObject.Find("Canvas").GetComponent<Points>().AddPoints(Cost);
+            Cost = 300;
+            Destroy(Tower);
+            Destroy(SpawnRange);
+            Tower = Instantiate(WaterTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeWater, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+
+        if (Tower == null && GameObject.Find("Canvas").GetComponent<Points>().points >= 300)
+        {
+            Cost = 300;
+            Tower = Instantiate(WaterTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeWater, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+    }
+    public void FireTowerTesla()
+    {
+
+        if (Tower != null && GameObject.Find("Canvas").GetComponent<Points>().points >= 250)
+        {
+            GameObject.Find("Canvas").GetComponent<Points>().AddPoints(Cost);
+            Cost = 250;
+            Destroy(Tower);
+            Destroy(SpawnRange);
+            Tower = Instantiate(FireTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeFire, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+
+        if (Tower == null && GameObject.Find("Canvas").GetComponent<Points>().points >= 250)
+        {
+            Cost = 250;
+            Tower = Instantiate(FireTower, mousepos, transform.rotation);
+            SpawnRange = Instantiate(RangeFire, mousepos, transform.rotation);
+            GameObject.Find("Canvas").GetComponent<Points>().RemovePoints(Cost);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat ik een scriptable object kan maken en waves kan maken van verschillende enemies en hoeveel ik er wil in mijn eigen volgorde.
+    </p>
+    <div class="Code"> <h3>Wave ScriptableObject</h3>
+        <div>
+            <pre>[CreateAssetMenu(fileName = "NewWave",menuName = "Magifence/Wave")]
+public class Waves : ScriptableObject
+{
+    public GameObject[] Enemies;
+    public int[] Amounts; 
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de tower schiet als er een enemy in zijn range zit.
+        <br>
+        Hij schiet hem dan in de directie van de enemy.
+    </p>
+    <div class="Code"> <h3>NormalShoot Script</h3>
+        <div>
+            <pre>public class NormalShoot : MonoBehaviour
+{
+    public Tower t;
+    public Transform Bullet;
+    public float time;
+    public float speed;
+    public float firerate;
+    public float pp;
+    
+    List<Transform> bullets = new List<Transform>();
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        time = 0;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        time -= Time.deltaTime;
+        if (GetComponent<Tower>().Enemies.Count > 0 && time <= 0)
+        {
+            Transform bulletPrefab;
+            bulletPrefab = Instantiate(Bullet, transform.position, Quaternion.identity);
+            if (bulletPrefab != null) bullets.Add(bulletPrefab);
+            time = firerate;
+            Destroy(bulletPrefab.gameObject, pp);
+        }
+        foreach (Transform t in bullets)
+        if(t != null)t.transform.Translate(Vector3.up * speed * Time.deltaTime, transform);
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat alle enemies spawnen, hij gaat langs de scriptable objects list van enemies 1 voor 1 en als ze allemaal dood zijn komt gelijk de volgende wave.
+        <br>
+        Als er geen waves meer zijn dan load hij de win scene.
+    </p>
+    <div class="Code"> <h3>EnemySpawn Script</h3>
+        <div>
+            <pre>public class EnemySpawn : MonoBehaviour
+{
+    public Waves waves;
+    [SerializeField] int wave = 0;
+    public List<Waves> wavesList;
+
+    void Update()
+    {
+        if (GameObject.FindGameObjectWithTag("Enemy") == null)
+        {
+            waves = wavesList[wave];
+            StartCoroutine(wavestart());
+            wave++;
+        }
+        if (wave >= wavesList.Count) GoToWin();
+    }
+    void GoToWin()
+    {
+        SceneManager.LoadScene("Win");
+    }
+    IEnumerator wavestart()
+    {
+        for (int i = 0; i < waves.Enemies.Length; i++)
+        {
+            for (int j = 0; j < waves.Amounts[i]; j++)
             {
-                Debug.Log("hi");
-                
+                Instantiate(waves.Enemies[i], this.transform.position, Quaternion.identity);
+                yield return new WaitForSeconds(0.6f);
             }
         }
     }
-
-    public void TowerPlacee()
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de enemies die geinstantiate worden het pad volgen, dit word gedaan door een vector array.
+        Als ik meer tijd hieraan had besteed, had ik het niet met een vector array gedaan omdat het moeilijk aan te passen is als je een nieuwe map wilt hebben.
+        <br>
+        Hij telt hier ook de lifetime op van elke enemy zodat ik weet welke enemy er voorin staat, en dat word dan de target van de towers.
+        <br>
+        Ook heb ik hierin staan dat als hij geraakt word door een electricity bullet dan word hij gestunned voor een kleine tijd.
+    </p>
+    <div class="Code"> <h3>EnemyMove Script</h3>
+        <div>
+            <pre>public class EnemyMove : MonoBehaviour
+{
+    float pime = 0.05f;
+    float speed = 1;
+    public float Lifetime;
+    float Starttime;
+    int i = 0;
+    Vector3[] array = new Vector3[] { (new Vector3(-0.5f, 1.5f)), (new Vector3(-6.5f, 1.5f)), (new Vector3(-6.5f, -2.5f)), (new Vector3(1.5f, -2.5f)), (new Vector3(1.5f, -0.5f)), (new Vector3(3.5f, -0.5f)), (new Vector3(3.5f, 3.5f)), (new Vector3(7.5f, 3.5f)), (new Vector3(7.5f, -2.5f)), (new Vector3(5.5f, -2.5f)), (new Vector3(5.5f, -5f)) };
+    private void Start()
     {
-        
-        Tower
-            = Instantiate(NormalTower, mousepos, transform.rotation);
+        Starttime = Time.time;
+    }
+    void Update()
+    {
+        Vector3 Direction = array[i] - transform.position;
+        Direction /= Direction.magnitude;
+        transform.position += Time.deltaTime * Direction * speed;
+        if ((array[i] - transform.position).magnitude < 0.01f)
+        {
+            i++;
+        }
+        Lifetime += (Time.time - Starttime) *speed;
+        pime -= Time.deltaTime;
+        if (pime <= 0) speed = 1;
 
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (CompareTag("LightningBolt") || collision.tag == "LightningBolt")
+        {
+            speed = 0;
+            pime = 0.05f;
+        }
+        
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de torens kijken naar de enemy met de langste lifetime in hun range.
+    </p>
+    <div class="Code"> <h3>TowerAim Script</h3>
+        <div>
+            <pre>public class Aim : MonoBehaviour
+{
+    public float dy;
+    public float dx;
     
+    void Update()
+    {
+        if ((GetComponent<Tower>().Enemies.Count != 0))
+        {
+            dy = transform.position.y - Tower.targetenemy.transform.position.y;
+            dx = transform.position.x - Tower.targetenemy.transform.position.x;
+            transform.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dy, dx) * Mathf.Rad2Deg + 90);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze kleine script zorgt ervoor dat de enemy een bepaalde aantal damage krijgt. Het damage verschilt tussen element, dus daarom heb ik ervoor gezorgt dat je het makkelijk kan aanpassen in de inspector.
+    </p>
+    <div class="Code"> <h3>DMG per element type Script</h3>
+        <div>
+            <pre>public class BulletDestroy : MonoBehaviour
+{
+    public float damage;
+    public string noDMG;
+    public string critDMG;
+    
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Enemy")
+        {
+            if (collision.name != noDMG + "(Clone)") collision.GetComponent<EnemyHP>().TakeDamage(damage);
+            if (collision.name == critDMG + "(Clone)") collision.GetComponent<EnemyHP>().TakeDamage(damage);
+            if (gameObject.name == "WaterDroplet(Clone)" || gameObject.name == "LightningBolt(Clone)") Destroy(gameObject);
+        }
+
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat de enemy damage pakt en het laat de hp van de enemy zien boven hun hoofd als een hpbar.
+        <br>
+        Deze script zorgt er ook voor dat hij naar de point script points stuurt als er een enemy doodgaat.
+    </p>
+    <div class="Code"> <h3>EnemyHP Script</h3>
+        <div>
+            <Pre>public class EnemyHP : MonoBehaviour
+{
+    public float hp;
+    public float maxhp;
+    public int points;
+    public GameObject healthBarUI;
+    public Slider slider;
+
+    private void Start(){
+        maxhp = hp;}
+    private void Update(){
+        if (hp > 0) slider.value = CalculateHealth();}
+    public void TakeDamage(float amountOfDamage)
+    {
+        hp -= amountOfDamage;
+        if (hp <= 0)
+        {
+            GameObject.Find("Canvas").GetComponent<Points>().AddPoints(points);
+            transform.position = new Vector2(50, 0);
+            Destroy(gameObject, 0.5f);
+        }
+    }
+    float CalculateHealth(){
+        return hp / maxhp;}
+}
+            </Pre>
+        </div>
+    </div>
+    <p class="smaller">
+        Deze script zorgt ervoor dat je points binnen krijgt per enemy, het aantal points per enemy verschilt tussen element, dus ik heb het zo gedaan dat het makkelijk in de inspector aantegeven is hoevel punten je per enemy wilt geven.
+    </p>
+    <div class="Code">
+        <div>
+            <pre>public class Points : MonoBehaviour
+{    
+    public int points = 100;
+    public void AddPoints(int somePoints)
+    {
+        points += somePoints;
+        
+    }
+    public void RemovePoints(int somePoints)
+    {
+        points -= somePoints;
+    }
 }
             </pre>
         </div>
