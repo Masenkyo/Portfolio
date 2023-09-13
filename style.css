@@ -3,6 +3,10 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     color: #ABB5C4;
     background-color: #445878;
+    background-image: url(Images/bluebackground.png);
+    background-size: 100%;
+    background-repeat:no-repeat;
+    background-blend-mode:lighten;
   }
 
 h1 {
