@@ -1,3 +1,7 @@
+*{
+  padding: 0;
+  margin: 0;
+}
 body {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
@@ -96,10 +100,6 @@ p {
 }
 footer{
   background-color: #ABB5C4;
-  position:fixed;
-  left:0px;
-  bottom:0px;
-  height: 80px;
   width:100%;
 }
 .Footer{
@@ -152,4 +152,10 @@ footer{
 }
 .distance {
   margin-bottom:8%;
+}
+header{
+  background-color: #ABB5C4;
+  top: 0;
+  height: 80px;
+  width:100%;
 }
