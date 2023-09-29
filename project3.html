@@ -4,17 +4,22 @@
     <link rel="stylesheet" href="style.css">
     <title>Portfolio Sil Wever</title>
 </head>
-<header>
-    
-</header>
 <body>
-    <h1>Sil Wever</h1>
-    <h2>Unity Gameplay Developer</h2>
-    <span class="line"></span>
+    <header>
+        <div class="logo">
+            <h1>Sil Wever</h1>
+            <h2>Unity Gameplay Developer</h2>
+        </div>        
+    </header>
+    <img class="background" src="Images/bluebackground.png" alt="">
     <a class="button" href="aboutme.html">About me</a>
     <a class="button" href="index.html">Projects</a>
+    <br>
+    <br>
     <h1>Explores</h1>
+    <br>
     <h2>On Going Project</h2>
+    <br>
     <video class="gif" autoplay loop muted>
         <source src="Images/Exploresvid.mp4" type="video/mp4">
     </video>
@@ -52,6 +57,7 @@
     <a class="size" href="https://github.com/Masenkyo/Explores" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <span class="line"></span>
     <p class="smaller">
         De movement script zorgt ervoor dat je rond kan bewegen, je kan springen en sneller vallen.
         <br>
@@ -148,6 +154,10 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <p class="smaller">
+        De damage script zorgt ervoor dat hp word afgetrokken als het word geraakt door een attack.
+    </p>
     <div class="Code"> <h3>Damage Script</h3>
         <div>
             <pre>public class AttackArea : MonoBehaviour
@@ -170,6 +180,10 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Health script handelt dat het hp niet over max kan en dat je de damage krijgt en hp heb.
+    </p>
     <div class="Code"> <h3>Health Script</h3>
         <div>
             <pre>public class Health : MonoBehaviour
@@ -229,6 +243,10 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script regelt de attacking part.
+    </p>
     <div class="Code"> <h3>PlayerAttack Script</h3>
         <div>
             <pre>public class PlayerAttack : MonoBehaviour

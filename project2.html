@@ -4,17 +4,22 @@
     <link rel="stylesheet" href="style.css">
     <title>Portfolio Sil Wever</title>
 </head>
-<header>
-    
-</header>
 <body>
-    <h1>Sil Wever</h1>
-    <h2>Unity Gameplay Developer</h2>
-    <span class="line"></span>
+    <header>
+        <div class="logo">
+            <h1>Sil Wever</h1>
+            <h2>Unity Gameplay Developer</h2>
+        </div>        
+    </header>
+    <img class="background" src="Images/bluebackground.png" alt="">
     <a class="button" href="aboutme.html">About me</a>
     <a class="button" href="index.html">Projects</a>
+    <br>
+    <br>
     <h1>Magifence</h1>
+    <br>
     <h2>Completed Project</h2>
+    <br>
     <video class="gif" autoplay loop muted>
         <source src="Images/TowerDefencevid.mp4" type="video/mp4">
     </video>
@@ -55,6 +60,7 @@
     <a class="size" href="https://github.com/Masenkyo/Magifencee/tree/master" target="_blank">
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
+    <span class="line"></span>
     <p class="smaller">
         Deze script regelt het plaatsen van alle towers.
         <br>
@@ -234,6 +240,7 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat ik een scriptable object kan maken en waves kan maken van verschillende enemies en hoeveel ik er wil in mijn eigen volgorde.
     </p>
@@ -248,6 +255,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat de tower schiet als er een enemy in zijn range zit.
         <br>
@@ -291,6 +299,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat alle enemies spawnen, hij gaat langs de scriptable objects list van enemies 1 voor 1 en als ze allemaal dood zijn komt gelijk de volgende wave.
         <br>
@@ -333,6 +342,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat de enemies die geinstantiate worden het pad volgen, dit word gedaan door een vector array.
         Als ik meer tijd hieraan had besteed, had ik het niet met een vector array gedaan omdat het moeilijk aan te passen is als je een nieuwe map wilt hebben.
@@ -382,6 +392,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat de torens kijken naar de enemy met de langste lifetime in hun range.
     </p>
@@ -405,6 +416,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze kleine script zorgt ervoor dat de enemy een bepaalde aantal damage krijgt. Het damage verschilt tussen element, dus daarom heb ik ervoor gezorgt dat je het makkelijk kan aanpassen in de inspector.
     </p>
@@ -430,6 +442,7 @@ public class Waves : ScriptableObject
             </pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat de enemy damage pakt en het laat de hp van de enemy zien boven hun hoofd als een hpbar.
         <br>
@@ -465,6 +478,7 @@ public class Waves : ScriptableObject
             </Pre>
         </div>
     </div>
+    <span class="line"></span>
     <p class="smaller">
         Deze script zorgt ervoor dat je points binnen krijgt per enemy, het aantal points per enemy verschilt tussen element, dus ik heb het zo gedaan dat het makkelijk in de inspector aantegeven is hoevel punten je per enemy wilt geven.
     </p>
