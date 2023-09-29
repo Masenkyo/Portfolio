@@ -35,7 +35,7 @@ h4 {
 }
 
 .project {
-  margin-top: 2vw;
+  margin-top: 6vw;
 }
 img {
   margin-bottom: 2vw;
@@ -44,13 +44,15 @@ img {
   image-rendering: pixelated;
 }
 .button{
-    background-color: #7C838E;
+    background-color: rgba(105, 105, 105, 0.205);
     text-decoration:none;
     color: white;
-    padding: 1vw 7vw;
+    padding: 2vw 5vw;
     font-size: 1vw;
-    border-radius: 1vw;
-    border: 0.25vw solid #ABB5C4;
+    border-radius: 0.5vw;
+    border: 0.2vw solid #ABB5C4;
+    margin-left: 0.1vw;
+    margin-right: 0.1vw;
   }
 .button:hover{
     background-color: #7090C4;
@@ -171,22 +173,37 @@ header{
   top: 0;
   height: 5.5vw;
   width:100%;
+  text-align: left;
 }
 .logo{
-  margin-top: 0.5%;
+  margin-top: 0.5vw;
   width: 20.6vw;
+  display: inline-block;
   margin-left: 1vw;
-  margin-right: auto;
 }
-.logo > div > h1{
+.logo > h1{
   text-align: left;
   font-size: 2vw;
 }
-.logo > div > h2{
+.logo > h2{
   text-align: left;
   font-size: 1.5vw;
 }
 .codesnippet{
   margin-left: 10%;
   margin-right: 10%;
+}
+.buttons{
+  float: right;
+  width: 50vw;
+}
+.buttons > a{
+  float: right;
+}
+.gap{
+  margin: 3vw;
+}
+.gap > a{
+  padding: 1vw 7vw;
+  background-color: rgba(255, 255, 255, 0.15);
 }
