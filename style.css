@@ -52,6 +52,8 @@ img {
     border-radius: 0.5vw;
     margin-left: 0.5vw;
     margin-right: 0.5vw;
+    max-width: 5vw;
+    min-width: 5vw;
   }
 .button:hover{
     background-color: #7090C4;
@@ -195,12 +197,13 @@ header{
 }
 .buttons{
   float: right;
-  width: 22vw;
+  width: 36vw;
   margin-right:1vw;
 }
 .buttons > a{
   float: right;
   margin-top: 0.7vw;
+  text-align: center;
 }
 .gap{
   margin: 3vw;
