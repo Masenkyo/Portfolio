@@ -47,12 +47,11 @@ img {
     background-color: rgba(105, 105, 105, 0.205);
     text-decoration:none;
     color: white;
-    padding: 2vw 5vw;
+    padding: 1.5vw 3vw;
     font-size: 1vw;
     border-radius: 0.5vw;
-    border: 0.2vw solid #ABB5C4;
-    margin-left: 0.1vw;
-    margin-right: 0.1vw;
+    margin-left: 0.5vw;
+    margin-right: 0.5vw;
   }
 .button:hover{
     background-color: #7090C4;
@@ -115,6 +114,7 @@ p {
 footer{
   background-color: #ABB5C4;
   width:100%;
+  position:relative;
 }
 .Footer{
   display: inline;
@@ -130,7 +130,7 @@ footer{
 }
 .Footer > h3{
   font-size: 2vw;
-  line-height: 6vw;
+  line-height: 8vw;
   color: #7C838E;
   display: inline;
 }
@@ -195,10 +195,12 @@ header{
 }
 .buttons{
   float: right;
-  width: 50vw;
+  width: 22vw;
+  margin-right:1vw;
 }
 .buttons > a{
   float: right;
+  margin-top: 0.7vw;
 }
 .gap{
   margin: 3vw;
