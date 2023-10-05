@@ -58,6 +58,7 @@
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
     <span class="line"></span>
+    <h1>NetworkManager en NetworkTransport</h1>
     <p class="smaller">
         Dit is de NetworkManager object. Het regelt al het network waar ik aan werk die network identities hebben.
         De component NetworkManager regelt het laden en andere dingen zoals, spawn de player (met identity),
@@ -72,6 +73,7 @@
     <img class="codesnippet" src="Images/NetworkManager1.png" alt="">
     <img class="codesnippet" src="Images/NetworkTransport.png" alt="">
     <span class="line"></span>
+    <h1>Network Identity/Transform/Animator</h1>
     <p class="smaller">
         Deze components zitten op de warrior (player) en laat alles wat te maken heeft met networking
         identificeren dat hij iets is met network.
@@ -88,6 +90,7 @@
     <img class="codesnippet" src="Images/NetworkTransform.png" alt="">
     <img class="codesnippet" src="Images/NetworkAnimator.png" alt="">
     <span class="line"></span>
+    <h1>Network Spawn</h1>
     <p class="smaller">
         Ik heb op de playerspawnpoint een Network Start Position component geplaatst, want dan weet de network manager
         waar hij de player moet spawnen.
@@ -96,11 +99,12 @@
     <br>
     <img class="codesnippet" src="Images/NSP.png" alt="">
     <span class="line"></span>
+    <h1>Jump/Stamina/etc. Sync</h1>
     <p class="smaller">
         Door "if (isLocalPlayer)" toe te voegen kan ik dit stukje via client side naar de server sturen zodat
         hij weet dat dit gebeurt.
     </p>
-    <div class="Code"> <h3>Jump mechanics welkomen</h3>
+    <div class="Code"> <h3>Jump mechanics</h3>
         <div>
             <pre>private void Start()
 {
@@ -129,6 +133,8 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <h1>Targetting/etc. Sync</h1>
     <p class="smaller">
         Door "if (isLocalPlayer)" toe te voegen kan ik dit stukje via client side naar de server sturen zodat
         hij weet dat dit gebeurt. Dit is vooral voor targetting, movement en attacking.
@@ -166,6 +172,8 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <h1>Move Sync</h1>
     <p class="smaller">
         Door "if (isLocalPlayer)" toe te voegen kan ik dit stukje via client side naar de server sturen zodat
         hij weet dat dit gebeurt. Dit is het meeste van de movement en een beetje animation.
@@ -223,6 +231,38 @@
             </pre>
         </div>
     </div>
+    <span class="line"></span>
+    <h1>Pull Ability Sync</h1>
+    <p class="smaller">
+        Ik gebruik hier Command zodat het met de server altijd synced, dus dan kan je alleen zien dat de server
+        de pull animation gebruik op beide client en server, maar nog niet de animation van client.
+        Dat is waar ik een nieuwe function aanmaak zodat ik het met ClientRPC sync naar de server voor client.
+        Dus nu als ik die functie in de oude normale DoSpecial functie doe met alles goed geconnect dan zou hij
+        de pull animatie moeten laten werken op beide schermen voor elke speler.
+    </p>
+    <div class="Code">
+        <div>
+            <pre>[Command(requiresAuthority = false)]
+public void DoSpecial(int layerIndex)
+{
+    SyncSpecial(layerIndex);
+    _animator.SetLayerWeight(layerIndex, 1f);
+    _animator.SetBool(IsSpecialActive, true);
+    _animator.SetTrigger(Special);
+    StartCoroutine(WaitForTime());
+    StartResetCoroutine();
+}
+[ClientRpc]
+void SyncSpecial(int layerIndex)
+{
+    _animator.SetLayerWeight(layerIndex, 1f);
+    _animator.SetBool(IsSpecialActive, true);
+    _animator.SetTrigger(Special);
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
     <p class="smaller">
         De rest is allemaal niet echt belangrijk, het was vooral tussen de al gemaakte scripts zoeken wat naar wat lijd
         en hoe ik alles kan implementen met networking wat nogal lastig ging, omdat hun hun codes niet echt goed en
