@@ -170,6 +170,9 @@ footer{
   overflow: auto;
   margin-bottom: 4vw;
 }
+.Code > h3 {
+  font-size: 1.5vw;
+}
 .distance {
   margin-bottom:8%;
 }
