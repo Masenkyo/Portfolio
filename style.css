@@ -29,13 +29,17 @@ h2{
   font-size: 1.6vw;
 }
 
+h3{
+  font-size: 1.2vw;
+}
+
 h4 {
   margin: 10px;
   font-size: 1vw;
 }
 
 .project {
-  margin-top: 6vw;
+  margin-top: 8vw;
 }
 img {
   margin-bottom: 2vw;
@@ -170,12 +174,13 @@ footer{
   margin-bottom:8%;
 }
 header{
-  background-color: rgba(171, 181, 196, 0.3);
+  background-color: #6D7982;
   position: fixed;
   top: 0;
   height: 5.5vw;
   width:100%;
   text-align: left;
+  box-shadow: 0 -6px 20px 5px rgba(0,0,0,0.5);
 }
 .logo{
   margin-top: 0.5vw;
@@ -211,4 +216,8 @@ header{
 .gap > a{
   padding: 1vw 7vw;
   background-color: rgba(255, 255, 255, 0.15);
+}
+br{
+  margin: 0;
+  padding: 0;
 }
