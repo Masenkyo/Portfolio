@@ -21,13 +21,13 @@
     <br>
     <h1 class="project">Project Starfall</h1>
     <br>
-    <h2>On-Going project (will never finish)</h2>
+    <h2>On-Going project</h2>
     <br>
     <video class="gif" autoplay loop muted>
         <source src="Images/VideoNetworking.mp4" type="video/mp4">
     </video>
     <h3 class="gap">
-        1/50+ Developers 
+        1-50+ Developers 
         <br>
         <br>
         ? Artists
@@ -273,6 +273,28 @@ void SyncSpecial(int layerIndex)
         sync attack, animation flip, en een paar kleine toevoegingen om het beter te laten werken."
     </p>
     </p>
+    <button class="myBtn" onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+    <script>
+        
+        let mybutton = document.getElementById("myBtn");
+        
+        
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+          } else {
+            mybutton.style.display = "none";
+          }
+        }
+        
+        
+        function topFunction() {
+          document.body.scrollTop = 0;
+          document.documentElement.scrollTop = 0;
+        }
+    </script>
 </body>
 <footer>
     <article class="Footer">
