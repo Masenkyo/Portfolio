@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <title>Portfolio Sil Wever</title>
+</head>
+<body>
+    <header>
+        <figure class="logo">
+            <h1>Sil Wever</h1>
+            <h2>Unity Gameplay Developer</h2> 
+        </figure>
+        <figure class="buttons">
+            <a class="button" href="to-do.html">To-Do</a> 
+            <a class="button" href="aboutme.html">About me</a>
+            <a class="button" href="index.html">Projects</a>  
+        </figure>
+    </header>
+    <img class="background" src="Images/bluebackground.png" alt="">
+    <br>
+    <br>
+    <h1 class="project">Input/Output</h1>
+    <br>
+    <h2>Completed Project</h2>
+    <br>
+    <video class="gif" autoplay loop muted>
+        <source src="Images/ArduinoVideoSmall.mp4" type="video/mp4">
+    </video>
+    <h3 class="gap">
+        1 Game Developer
+    </h3>
+    <p class="smaller" >
+        Inleiding
+        <br>
+        <br>
+        Dit project ging ik maken in mijn 2de jaar van media college in de derde periode met het thema "Input/Output".
+        Het was een solo of duo project, maar ik koos ervoor om alleen te gaan werken.
+        <br>
+        <br>
+        <br>
+        <br>
+        Uitleg
+        <br>
+        <br>
+        De game is simpel, kom zover mogelijk en probeer je highscore te beaten.
+        <br>
+        <br>
+        Met een arduino controller die ik heb gemaakt zijn er knoppen waar je op kan klikken voor de functies,
+        maar ik heb ervoor gezorgt dat je het ook zonder een arduino kan spelen. Als je zonder speelt, dan kan je
+        met (W) springen, (S) sneller vallen, (Left Shift) sneller bewegen en met (Space) naar links of rechts bewegen.
+        <br>
+        <br>
+        Je kan short jumps en long jumps maken door de knop langer of korter ingedrukt te houden. Ook kan je S inklikken
+        om sneller naar beneden te gaan.
+        <br>
+        <br>
+        De kant dat je op beweegt met je speler hangt af of je de knop ingedrukt houd of niet, ik heb deze manier
+        van beweging gekozen omdat het uniek is en best wel leuk. Als je hem inklikt ga je naar achter, maar als
+        je hem niet hebt ingedrukt gaat hij gewoon naarvoren. Hierdoor blijft je speler altijd bewegen en moet je,
+        constant blijven klikken zodat hij kan landen op een platform.
+        <br>
+        <br>
+        De shift knop zorgt ervoor dat als je hem indrukt je 2x zo snel gaat en als je hem los laat gewoon op
+        normale speed beweegt.
+    </p>
+    <a class="size" href="https://github.com/Masenkyo/InputOutput" target="_blank">
+        <img src="Images/GitHubLogo.png" alt="Github">
+    </a>
+    <p>de game kan helaas nog niet op itch aangezien ik een arduino nodig heb om een error van systemIO.Ports weg te halen</p>
+    <span class="line"></span>
+    <p class="smaller">
+        Dit is de movement script, ik ga hieronder uitleggen wat elke functie doet en waarom ik het zo heb gedaan.
+    </p>
+    <div class="Code"> <h3>Movement</h3>
+        <div>
+            <pre>public class Movement : MonoBehaviour
+{
+
+    #region Variables
+    public ArduinoSerialCommunication arduinoSerialCommunication;
+    public GameObject scoree;
+    GameObject Speed;
+    GameObject Camera;
+    GameObject player;
+    Rigidbody2D rb;
+    float speed = 1;
+    [SerializeField] float jumpForce;
+    [SerializeField] float jumpStartTime;
+    private float jumpTime;
+    public bool isJumping;
+    public bool isGrounded;
+    public bool isSpeeding;
+    public Transform feetPos;
+    public float checkRadius;
+    public LayerMask whatIsGround;
+    float time;
+    public int score = 0;
+    public int highScore;
+    float amp = 1;
+    #endregion Variables
+    void Start()
+    {
+        highScore = PlayerPrefs.GetInt("highScore", highScore);
+        Speed = GameObject.Find("Speed");
+        scoree = GameObject.Find("Score");
+        Camera = GameObject.Find("Main Camera");
+        arduinoSerialCommunication = Camera.GetComponent<ArduinoSerialCommunication>();
+        player = GameObject.Find("player");
+        rb = player.GetComponent<Rigidbody2D>();
+    }
+    void Update()
+    {
+        PlayerMovement();
+        Jump();
+        Score();
+        time += Time.deltaTime * amp;
+        PlayerPrefs.SetInt("highScore", highScore);
+    }
+    public void Score()
+    {
+        amp += Time.deltaTime / 10;
+        score = (int)time / 10;
+        scoree.GetComponent<TMP_Text>().text = "Score = " + score.ToString() + " HighScore = " + highScore.ToString();
+        if (highScore < score)
+        {
+            highScore = score;
+        }
+    }
+    #region MovementFunctions
+    public void PlayerMovement()
+    {
+        Speed.GetComponent<TMP_Text>().text = "Speed = " + speed.ToString();
+        speed += Time.deltaTime / 10;
+        if (arduinoSerialCommunication.speeding == true && isSpeeding == false)
+        {
+            speed *= 2;
+            isSpeeding = true;
+        }
+        if (arduinoSerialCommunication.speeding == false && isSpeeding == true)
+        {
+            speed /= 2;
+            isSpeeding = false;
+        }
+        if (arduinoSerialCommunication.swapping == true) player.transform.position -= new Vector3(speed,0,0) * Time.deltaTime;
+        if (arduinoSerialCommunication.swapping == false) player.transform.position += new Vector3(speed, 0, 0) * Time.deltaTime;
+    }
+    public void Jump()
+    {
+        isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
+        if (isGrounded == true && arduinoSerialCommunication.jumping == true) {
+            isJumping = true;
+            jumpTime = jumpStartTime;
+            rb.velocity = Vector2.up * jumpForce;
+        }
+        if (arduinoSerialCommunication.jumping == true && isJumping == true) {
+            if (jumpTime > 0) {
+                rb.velocity = Vector2.up * jumpForce;
+                jumpTime -= Time.deltaTime;
+            }
+            else isJumping = false;
+        }
+        if (arduinoSerialCommunication.jumping == false) isJumping = false;
+        if (Input.GetKey(KeyCode.S) && isGrounded == false) rb.AddForce(new Vector2(0, -2));
+    }
+    #endregion MovementFunctions
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script zorgt voor de score system en hoe langer je leeft hoe meer punten je krijgt.
+        De aantal punten word ge amplified door hoe snel het scherm naar rechts gaat, want het word moeilijker,
+        dus dan is het wel logisch dat je meer punten hoort te krijgen.
+        <br>
+        In de update kan je zien dat daar time word ge ampt en ook in de functie.
+        De PlayerPrefs zorgen ervoor dat je highscore word onthouden als je quit en dan later terug komt.
+    </p>
+    <div class="Code"> <h3>Score</h3>
+        <div>
+            <pre>public void Score()
+{
+    amp += Time.deltaTime / 10;
+    score = (int)time / 10;
+    scoree.GetComponent<TMP_Text>().text = "Score = " + score.ToString() + " HighScore = " + highScore.ToString();
+    if (highScore < score)
+    {
+        highScore = score;
+    }
+}
+void Update(){
+    Score();
+    time += Time.deltaTime * amp;
+    PlayerPrefs.SetInt("highScore", highScore);
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script laat als eerst je speed zien in een nummer via UI.
+        Dan word het speed geregelt en gaat sneller overtime.
+        Daarna kan je zien dat ik de Speedup functie aan en uit laat doen via een bool.
+        Dat doe ik omdat ik een signaal naar de arduino moet kunnen sturen in het arduino script.
+        Nu komen we aan bij swapping, swapping doet net als de speedup via bools.
+        <br>
+        Het swappen zorgt ervoor welke richting je player opgaat, dus als je de knop loslaat dan gaat hij
+        naar rechts toe, en als je hem inklikt of ingedrukt houd, dan gaat hij naar links.
+        Ik vond dit een leuke manier van de character bewegen aangezien je dit niet vaak ziet, en het maakt
+        het spel een beetje uniek.
+    </p>
+    <div class="Code"> <h3>PlayerMovement met Arduino en/of Keyboard</h3>
+        <div>
+            <pre>public void PlayerMovement()
+{
+    Speed.GetComponent<TMP_Text>().text = "Speed = " + speed.ToString();
+    speed += Time.deltaTime / 10;
+    if (arduinoSerialCommunication.speeding == true && isSpeeding == false)
+    {
+        speed *= 2;
+        isSpeeding = true;
+    }
+    if (arduinoSerialCommunication.speeding == false && isSpeeding == true)
+    {
+        speed /= 2;
+        isSpeeding = false;
+    }
+    if (arduinoSerialCommunication.swapping == true) player.transform.position -= new Vector3(speed,0,0) * Time.deltaTime;
+    if (arduinoSerialCommunication.swapping == false) player.transform.position += new Vector3(speed, 0, 0) * Time.deltaTime;
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        In het begin zie je dat ik kijk of de player is geground met een raycast die recht naar beneden wijst.
+        Nu als alles true is mag hij springen, ik heb de jump ook gemaakt met bools, zodat hij het naar de arduino
+        kan sturen, maar ook zodat ik ervoor kan zorgen dat het ook verschil maakt met hoelang je de jump knop
+        ingedrukt houd. 
+        <br>
+        Dus nu als je hem langer ingedrukt houd dan springt hij hoger, en andersom natuurlijk korter.
+        Aan het einde voeg ik nog een functie toe die ervoor zorgt dat je sneller naar beneden kan vallen met de S key.
+    </p>
+    <div class="Code"> <h3>Jump en Ground check script</h3>
+        <div>
+            <pre>public void Jump()
+{
+    isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
+    if (isGrounded == true && arduinoSerialCommunication.jumping == true) {
+        isJumping = true;
+        jumpTime = jumpStartTime;
+        rb.velocity = Vector2.up * jumpForce;
+    }
+    if (arduinoSerialCommunication.jumping == true && isJumping == true) {
+        if (jumpTime > 0) {
+            rb.velocity = Vector2.up * jumpForce;
+            jumpTime -= Time.deltaTime;
+        }
+        else isJumping = false;
+    }
+    if (arduinoSerialCommunication.jumping == false) isJumping = false;
+    if (Input.GetKey(KeyCode.S) && isGrounded == false) rb.AddForce(new Vector2(0, -2));
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script zorgt een paar simpele dingen, zoals restarten als je dood bent door op de knop te klikken.
+        Ook stuurt deze script een message naar de arduino dat hij leeft.
+    </p>
+    <div class="Code"> <h3>Menu Handler</h3>
+        <div>
+            <pre>public class Menu : MonoBehaviour
+{
+    GameObject Camera;
+    void Start()
+    {
+        Camera = GameObject.Find("Main Camera");
+    }
+    public void Retry()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
+    public void Write()
+    {
+        Camera.GetComponent<ArduinoSerialCommunication>().serial.WriteLine("Alive!");
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script doet alles wat te maken heeft met de arduino en zorgt dat alles goed gecommunicate word.
+        Ik ga meer uitleggen over iedere functie onder deze script.
+    </p>
+    <div class="Code"> <h3>Arduino Handler script</h3>
+        <div>
+            <pre>public class ArduinoSerialCommunication : MonoBehaviour
+{
+    GameObject player;
+    GameObject Camera;
+    public GameObject UI;
+    public Movement movement;
+    public string portname;
+    public SerialPort serial;
+    public bool jumping;
+    public bool speeding;
+    public bool swapping;
+    bool stop = false;
+    bool stop2 = false;
+    string[] ports = SerialPort.GetPortNames();
+    void Start()
+    {
+        Camera = GameObject.Find("Main Camera");
+        player = GameObject.Find("player");
+        movement = player.GetComponent<Movement>();
+        serial = new SerialPort();
+
+        List<string> portOptions = new List<string>();
+
+
+        for (int i = 0; i < ports.Length; ++i)
+        {
+            Debug.Log(ports[i]);
+        }
+        if (ports.Length > 0)
+        {
+            serial.BaudRate = 115200;
+            serial.DataBits = 8;
+            serial.Parity = Parity.None;
+            serial.StopBits = StopBits.One;
+            serial.PortName = ports[0];
+            if (ports == null)
+            {
+                serial.PortName = null;
+            }
+            for (int i = 0; i < 4; ++i)
+            {
+                try
+                {
+                    serial.Open();
+
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e.Message);
+                }
+            }            
+        }
+    }
+
+    void Update()
+    {
+        if (player.transform.position.y < -7f && Camera.GetComponent<PlatformSpawn>().enabled == true && stop2 == false)
+        {
+            Camera.GetComponent<PlatformSpawn>().enabled = false;
+            Instantiate(UI, new Vector3(player.transform.position.x, 0, 0), Quaternion.identity);
+            player.GetComponent<Movement>().enabled = false;
+            serial.WriteLine("Dead!");
+            stop2 = true;
+        }
+        if (serial.IsOpen && serial.BytesToRead > 0)
+        {
+            string input = serial.ReadLine();
+            Debug.Log(input);
+            if (input == "jump" || Input.GetKeyDown(KeyCode.W))
+            {
+                jumping = true;
+            }
+            if (input == "jump not" || Input.GetKeyUp(KeyCode.W))
+            {
+                jumping = false;
+            }
+            if (input == "speed" || Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                speeding = true;
+            }
+            if (input == "not speed" || Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                speeding = false;
+            }
+            if (input == "swap" || Input.GetKeyDown(KeyCode.Space))
+            {
+                swapping = true;
+            }
+            if (input == "swap not" || Input.GetKeyUp(KeyCode.Space))
+            {
+                swapping = false;
+            }
+        }
+        if (!serial.IsOpen)
+        {
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                jumping = true;
+            }
+            if (Input.GetKeyUp(KeyCode.W))
+            {
+                jumping = false;
+            }
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                speeding = true;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                speeding = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                swapping = true;
+            }
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                swapping = false;
+            }
+        }
+        if (player.GetComponent<Movement>().isGrounded == false && stop == false)
+        {
+            serial.WriteLine("True");
+            stop = true;
+        }
+        else if (stop == true && player.GetComponent<Movement>().isGrounded == true)
+        {
+            stop = false;
+            serial.WriteLine("False");
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        In de start kan je alle basic settings zien dat je nodig hebt om te connecten met de arduino via unity c#.
+        De for loop zoekt naar elke port die de arduino heeft en kiest de relevante die word gebruikt.
+        Als er meer dan 1 port is dat gaat hij alle settings erin zetten en dan de serial openen.
+    </p>
+    <div class="Code"> <h3>Start Settings voor Arduino</h3>
+        <div>
+            <pre>void Start()
+{
+    Camera = GameObject.Find("Main Camera");
+    player = GameObject.Find("player");
+    movement = player.GetComponent<Movement>();
+    serial = new SerialPort();
+
+    List<string> portOptions = new List<string>();
+
+
+    for (int i = 0; i < ports.Length; ++i)
+    {
+        Debug.Log(ports[i]);
+    }
+    if (ports.Length > 0)
+    {
+        serial.BaudRate = 115200;
+        serial.DataBits = 8;
+        serial.Parity = Parity.None;
+        serial.StopBits = StopBits.One;
+        serial.PortName = ports[0];
+        if (ports == null)
+        {
+            serial.PortName = null;
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            try
+            {
+                serial.Open();
+
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
+            }
+        }            
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Ik had hier zeker functies bij kunnen gebruiken, maar toen ik het maakte was ik best wel in een haast, want
+        we kregen te horen dat we opeens alles in een paar weken moesten afmaken terwijl ze ons alleen maar lessen
+        gaven over hoe lampjes werken via arduino en niet hoe wij konden connecten, dus ik het code is niet het mooist wat het kan zijn.
+        <br>
+        <br>
+        De eerste if statement zorgt ervoor dat als hij onder -7 komt in de Y-as dan gaat hij dood en disabled hij alles.
+        Daarna stuurt hij een bericht naar de arduino dat hij dood is gegaan en laat een rood lampje knipperen.
+        <br>
+        Nu bij de serial.isopen if statement regelt hij alle inputs dat inkomen via arduino en leest het verder onderin
+        de code af. Dit zijn ook de bools die je ziet in de movement script en hier worden ze aan en uit gezet.
+        Je kan ook zien dat ik heb toegevoegt dat je kan spelen als er geen serial open is en je geen arduino hebt.
+        <br>
+        Onder dit zit dan de Grounded code, hier word gewoon gestuurd naar de arduino en terug of hij grounded is of niet.
+    </p>
+    <div class="Code"> <h3>Update en veel input code</h3>
+        <div>
+            <pre>void Update()
+{
+    if (player.transform.position.y < -7f && Camera.GetComponent<PlatformSpawn>().enabled == true && stop2 == false)
+    {
+        Camera.GetComponent<PlatformSpawn>().enabled = false;
+        Instantiate(UI, new Vector3(player.transform.position.x, 0, 0), Quaternion.identity);
+        player.GetComponent<Movement>().enabled = false;
+        serial.WriteLine("Dead!");
+        stop2 = true;
+    }
+    if (serial.IsOpen && serial.BytesToRead > 0)
+    {
+        string input = serial.ReadLine();
+        Debug.Log(input);
+        if (input == "jump" || Input.GetKeyDown(KeyCode.W))
+        {
+            jumping = true;
+        }
+        if (input == "jump not" || Input.GetKeyUp(KeyCode.W))
+        {
+            jumping = false;
+        }
+        if (input == "speed" || Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            speeding = true;
+        }
+        if (input == "not speed" || Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            speeding = false;
+        }
+        if (input == "swap" || Input.GetKeyDown(KeyCode.Space))
+        {
+            swapping = true;
+        }
+        if (input == "swap not" || Input.GetKeyUp(KeyCode.Space))
+        {
+            swapping = false;
+        }
+    }
+    if (!serial.IsOpen)
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            jumping = true;
+        }
+        if (Input.GetKeyUp(KeyCode.W))
+        {
+            jumping = false;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            speeding = true;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            speeding = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            swapping = true;
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            swapping = false;
+        }
+    }
+    if (player.GetComponent<Movement>().isGrounded == false && stop == false)
+    {
+        serial.WriteLine("True");
+        stop = true;
+    }
+    else if (stop == true && player.GetComponent<Movement>().isGrounded == true)
+    {
+        stop = false;
+        serial.WriteLine("False");
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Dit is het script van het Arduino software en hier kan ik direct naar de arduino dingen sturen via draden.
+    </p>
+    <div class="Code"> <h3>De Arduino Code</h3>
+        <div>
+            <pre>int button = 13;
+int buttonsped = 8;
+int led = 12;
+int deathled = 11;
+int swap = 7;
+int ledbrightness = 50;
+int fade = 5;
+String readString = "";
+bool death;
+bool jumping;
+bool speeding;
+bool swapping;
+void setup() {
+    pinMode (button, INPUT_PULLUP);
+    pinMode (buttonsped, INPUT_PULLUP);
+    pinMode (swap, INPUT_PULLUP);
+    pinMode (led, OUTPUT);
+    pinMode (deathled, OUTPUT);
+    Serial.begin(115200);
+}
+
+void loop() {
+    if (death == true) {
+    analogWrite(deathled, ledbrightness);
+    ledbrightness = ledbrightness + fade;
+    if (ledbrightness == 100 || ledbrightness == 0){
+        fade = -fade;
+    }
+    delay(50);
+    }
+    if (!digitalRead(swap) && swapping == true){
+    Serial.println("swap");
+    swapping = false;
+    }
+    if (digitalRead(swap) && swapping == false){
+    Serial.println("swap not");
+    swapping = true;
+    }
+    if (digitalRead(button) && jumping == true){
+    Serial.println("jump not");
+    jumping = false;
+    }
+    if (!digitalRead(button) && jumping == false){
+    Serial.println("jump"); 
+    jumping = true;
+    }
+    if (digitalRead(buttonsped) && speeding == true){
+    Serial.println("not speed");
+    speeding = false;
+    }
+    if (!digitalRead(buttonsped) && speeding == false){
+    Serial.println("speed"); 
+    speeding = true;
+    }
+    while (Serial.available()) {
+    delay(3);
+    char c = Serial.read();
+    readString += c;
+    }
+    if (readString.length() >0) {
+    Serial.println(readString);
+
+    if(readString.indexOf("True") >=0)
+    {
+        digitalWrite(led, 1);
+    }
+
+    if(readString.indexOf("False") >=0)
+    {
+        digitalWrite(led, 0);
+    }
+
+    if (readString.indexOf("Dead!") >=0){
+        death = true;
+    }
+    if (readString.indexOf("Alive!") >=0){
+        death = false;
+        analogWrite(deathled, 0);
+    }
+
+    readString="";
+    }
+}   
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        De pinModes zorgen ervoor dat ik elke draad, knop en lampje kan identificeren en precies kan vertellen
+        wat ik wil dat ze gaan doen. De serial.begin() zorgt ervoor dat hij start.
+    </p>
+    <div class="Code"> <h3>Setup (basicly een start of awake in c#)</h3>
+        <div>
+            <pre>void setup() {
+    pinMode (button, INPUT_PULLUP);
+    pinMode (buttonsped, INPUT_PULLUP);
+    pinMode (swap, INPUT_PULLUP);
+    pinMode (led, OUTPUT);
+    pinMode (deathled, OUTPUT);
+    Serial.begin(115200);
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        De loop is waar ik alle functies en signalen opvang en start.
+        Je kan zien dat ik in het begin een soort van fade maak voor een lampje als je dood bent en die gaat aan
+        als er via unity word gestuurd naar deze arduino script dat hij dood is.
+        <br>
+        Daar onder zit gewoon alles dat aan en uit word gezet en print het terug naar unity.
+        De rest is gewoon readstring en wat bools die ik aan en uitzet en weer stuur naar unity en vangt ook weer op
+        vanaf unity.
+    </p>
+    <div class="Code"> <h3>Loop (basicly een update in c#)</h3>
+        <div>
+            <pre>void loop() {
+if (death == true) {
+analogWrite(deathled, ledbrightness);
+ledbrightness = ledbrightness + fade;
+if (ledbrightness == 100 || ledbrightness == 0){
+    fade = -fade;
+}
+delay(50);
+}
+if (!digitalRead(swap) && swapping == true){
+Serial.println("swap");
+swapping = false;
+}
+if (digitalRead(swap) && swapping == false){
+Serial.println("swap not");
+swapping = true;
+}
+if (digitalRead(button) && jumping == true){
+Serial.println("jump not");
+jumping = false;
+}
+if (!digitalRead(button) && jumping == false){
+Serial.println("jump"); 
+jumping = true;
+}
+if (digitalRead(buttonsped) && speeding == true){
+Serial.println("not speed");
+speeding = false;
+}
+if (!digitalRead(buttonsped) && speeding == false){
+Serial.println("speed"); 
+speeding = true;
+}
+while (Serial.available()) {
+delay(3);
+char c = Serial.read();
+readString += c;
+}
+if (readString.length() >0) {
+Serial.println(readString);
+
+if(readString.indexOf("True") >=0)
+{
+    digitalWrite(led, 1);
+}
+
+if(readString.indexOf("False") >=0)
+{
+    digitalWrite(led, 0);
+}
+
+if (readString.indexOf("Dead!") >=0){
+    death = true;
+}
+if (readString.indexOf("Alive!") >=0){
+    death = false;
+    analogWrite(deathled, 0);
+}
+
+readString="";
+}
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        Deze script zorgt ervoor dat platforms spawnen op random hoogtes en lengtes.
+    </p>
+    <div class="Code"> <h3>Platform spawn code</h3>
+        <div>
+            <pre>public class PlatformSpawn : MonoBehaviour
+{
+    #region Variables
+    public GameObject platformPrefab;
+    public GameObject spawnPrefab;
+    float speed;
+    public Vector3 direction;
+    public List<GameObject> spawnList = new List<GameObject>();
+    public float time;
+    float number = 5;
+    float height = 1;
+    #endregion Variables
+    void Start()
+    {
+        spawnPrefab = Instantiate(platformPrefab, new Vector3(transform.position.x, -2, 0), transform.rotation);
+        spawnList.Add(spawnPrefab);
+    }
+    void Update()
+    {
+        speed += Time.deltaTime / 10;
+        direction = new Vector3 (speed, 0, 0);
+        transform.position += direction * Time.deltaTime;
+        Platform();
+    }
+    void Platform()
+    {
+        time += Time.deltaTime * speed;
+        if (time > number)
+        {
+            number = Random.Range(3f, 7f);
+            height = Random.Range(-2f, 2f);
+            spawnPrefab = Instantiate(platformPrefab, new Vector3(transform.position.x + 3, height, 0), transform.rotation);
+            spawnList.Add(spawnPrefab);
+            time = 0;
+            if (spawnList.Count == 4)
+            {
+                Destroy(spawnList[0]);
+                spawnList[0] = spawnPrefab;
+                spawnList.Remove(spawnPrefab);
+            }
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        De start geeft spawnPrefab de instantiate voor een platform de locatie informatie ervan.
+        Daarna add hij de spawnPrefab aan een list.
+        <br>
+        De update zorgt ervoor dat de platform spawnt op normale plekken ookal gaat de camera sneller naar rechts en de player.
+        De spawnrate van platformen word geincreased.
+    </p>
+    <div class="Code"> <h3>Start en Update</h3>
+        <div>
+            <pre>void Start()
+{
+    spawnPrefab = Instantiate(platformPrefab, new Vector3(transform.position.x, -2, 0), transform.rotation);
+    spawnList.Add(spawnPrefab);
+}
+void Update()
+{
+    speed += Time.deltaTime / 10;
+    direction = new Vector3 (speed, 0, 0);
+    transform.position += direction * Time.deltaTime;
+    Platform();
+}
+            </pre>
+        </div>
+    </div>
+    <span class="line"></span>
+    <p class="smaller">
+        De platform functie zorgt voor alle dingen dat de platforms kunnen.
+        Eerst regelt hij de speed net als in update.
+        Daarna zorgt hij ervoor dat de platforms niet te hoog of te laag of te verweg of te dichtbij kunnen spawnen.
+        <br>
+        Hij add ook de platforms aan een list en checkt daarna welke het oudst is.
+        Dit is nodig, want we willen graag dat de oudste word verwijderd, en anders komen er teveel platformen in de game.
+        Ik heb ervoor gekozen om maximaal 3 platformen in de game te houden, dus de 4de word uit de lijst en uit de game verwijderd.
+    </p>
+    <div class="Code"> <h3>Platform Functie</h3>
+        <div>
+            <pre>void Platform()
+{
+    time += Time.deltaTime * speed;
+    if (time > number)
+    {
+        number = Random.Range(3f, 7f);
+        height = Random.Range(-2f, 2f);
+        spawnPrefab = Instantiate(platformPrefab, new Vector3(transform.position.x + 3, height, 0), transform.rotation);
+        spawnList.Add(spawnPrefab);
+        time = 0;
+        if (spawnList.Count == 4)
+        {
+            Destroy(spawnList[0]);
+            spawnList[0] = spawnPrefab;
+            spawnList.Remove(spawnPrefab);
+        }
+    }
+}
+            </pre>
+        </div>
+    </div>
+    <button class="myBtn" onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+    <script>
+        
+        let mybutton = document.getElementById("myBtn");
+        
+        
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+          } else {
+            mybutton.style.display = "none";
+          }
+        }
+        
+        
+        function topFunction() {
+          document.body.scrollTop = 0;
+          document.documentElement.scrollTop = 0;
+        }
+    </script>
+</body>
+<footer>
+    <article class="Footer">
+        <h3></h3>
+        <a href="mailto:kimensil@hotmail.com">
+            <img src="Images/Mail.png" alt="E-mail">
+        </a>
+        <a href="https://github.com/Masenkyo" target="_blank">
+            <img src="Images/GitHubLogo.png" alt="Github">
+        </a>
+    </article>
+</footer>
+</html>
