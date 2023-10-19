@@ -264,16 +264,58 @@ void SyncSpecial(int layerIndex)
         </div>
     </div>
     <span class="line"></span>
+    <h1>Particles Sync</h1>
     <p class="smaller">
-        De rest is allemaal niet echt belangrijk, het was vooral tussen de al gemaakte scripts zoeken wat naar wat lijd
-        en hoe ik alles kan implementen met networking wat nogal lastig ging, omdat hun hun codes niet echt goed en
-        efficient maken, maar het lukt uiteindelijk wel.
+        Hierbij heb ik de update een islocalplayer gemaakt zodat hij dingen gaat syncen die ik erin aanpas.
+        Ik heb de ongroundwalk en onstopmoving gesynced door [command] en [clientrpc] te gebruiken en dat te
+        verplaatsen met wat er bij de if statement zat zodat hij het gaat syncen.
+        onstopmoving zorgt ervoor dat de particles stoppen als je stil staat en ongroundwalk dat ze starten als je
+        loopt.
+        <br>
+        Daaronder heb ik de dust sprites gesynced, maar ze hebben het erg simpel gecodeerd. Daarom heb ik
+        een if statement gebruikt zodat ik dezelfde functie kon gebruiken bij 2 verschillende dingen.
+    </p>
+    <div class="Code">
+        <div>
+            <pre>private void FixedUpdate()
+{
+    if (isLocalPlayer)
+    {
 
-        Dus in kort wat ik heb gedaan is:
-        "Player spawn, sync other player, sync movement, sync jump, sync animation walk, sync animation jump, sync pull,
-        sync attack, animation flip, en een paar kleine toevoegingen om het beter te laten werken."
-    </p>
-    </p>
+        if (_isGrounded && _velocity.magnitude == 0 && _lastVelocity.magnitude > 0) AnimationStop0();
+
+        if (_isGrounded && _velocity.magnitude > 0 && _lastVelocity.magnitude == 0) onStartMoving?.Invoke();
+
+        if (_isGrounded && _velocity.magnitude > 0) AnimationSync0();
+
+    }
+}
+[Command] void AnimationSync0() => AnimationSync();
+[ClientRpc] void AnimationSync() => onGroundWalk?.Invoke();
+[Command] void AnimationStop0() => AnimationStop();
+[ClientRpc] void AnimationStop() => onStopMoving?.Invoke();
+
+private void CheckMoveDirection(Vector2 newDirection)
+{
+    if (newDirection.x == 0) return;
+    if (newDirection.x < 0 && _lastVelocity.x >= 0)
+    {
+        onTurnLeft?.Invoke();
+        if (!_isGrounded) return;
+        AnimationSyncParticles0(0);
+    }
+    else if (newDirection.x > 0 && _lastVelocity.x <= 0)
+    {
+        onTurnRight?.Invoke();
+        if (!_isGrounded) return;
+        AnimationSyncParticles0(1);
+}
+[Command] void AnimationSyncParticles0(int n) => AnimationSyncParticles(n);
+[ClientRpc] void AnimationSyncParticles(int n) { if (n == 0) onTurnLeftGrounded?.Invoke(); else onTurnRightGrounded?.Invoke(); }
+            </pre>
+        </div>            
+    </div>
+        
     <button class="myBtn" onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
     <script>
         
