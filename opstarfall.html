@@ -58,7 +58,8 @@
         <img src="Images/GitHubLogo.png" alt="Github">
     </a>
     <span class="line"></span>
-    <h1>NetworkManager en NetworkTransport</h1>
+    <a href="silwever.nl/html#hyperlink"></a>
+    <h1 id="hyperlink">NetworkManager en NetworkTransport</h1>
     <p class="smaller">
         Dit is de NetworkManager object. Het regelt al het network waar ik aan werk die network identities hebben.
         De component NetworkManager regelt het laden en andere dingen zoals, spawn de player (met identity),
@@ -108,27 +109,26 @@
         <div>
             <pre>private void Start()
 {
-    if (isLocalPlayer)
-    {
-        _playerInput = GetComponent<PlayerInput>();
-        _playerControlsActions = _playerInput.actions;
+    if (!isLocalPlayer) return;
+    
+    _playerInput = GetComponent<PlayerInput>();
+    _playerControlsActions = _playerInput.actions;
 
-        _staminaLookup = GetComponent<StaminaLookup>();
+    _staminaLookup = GetComponent<StaminaLookup>();
 
-        levelReloader = FindObjectOfType<LevelReloader>();
+    levelReloader = FindObjectOfType<LevelReloader>();
 
-        _playerControlsActions["Jump"].performed += Jump;
-        _playerControlsActions["Grab"].performed += Grab;
+    _playerControlsActions["Jump"].performed += Jump;
+    _playerControlsActions["Grab"].performed += Grab;
 
-        _playerControlsActions["ReleaseGrab"].started += ReleaseGrab;
-        _playerControlsActions["ClimbUp"].started += ClimbUp;
-        _playerControlsActions["ResetLevel"].started += ResetLevel;
+    _playerControlsActions["ReleaseGrab"].started += ReleaseGrab;
+    _playerControlsActions["ClimbUp"].started += ClimbUp;
+    _playerControlsActions["ResetLevel"].started += ResetLevel;
 
-        InstantiatePlayerAbility();
-        if (targetSelector != null) TargetingStart();
+    InstantiatePlayerAbility();
+    if (targetSelector != null) TargetingStart();
 
-        _playerControlsActions.Enable();
-    }
+    _playerControlsActions.Enable();
 }
             </pre>
         </div>
@@ -143,31 +143,30 @@
         <div>
             <pre>private void FixedUpdate()
 {
-    if (isLocalPlayer)
-    {
-        if (targetSelector != null) TargetingStart(false);
+    if (!isLocalPlayer) return;
     
-        var isBlockingMovement = CannotMove || playerSpecialAbility != null && playerSpecialAbility.IsBlockingMovement;
-        if (isBlockingMovement)
-        {
-            if(CannotMove)playerMovement.currentMovementState = MovementStates.Walking; // todo: dit moet wat netter gemaakt worden.
-            return;
-        }
-
-        Vector2 moveInput = _playerControlsActions["Move"].ReadValue<Vector2>();
-        var isSprinting = _playerControlsActions["SprintActivator"].ReadValue<float>() == 1 && moveInput.magnitude != 0;
-
-        var canSprint = isSprinting && _staminaLookup.UseStamina("Sprinting");
-        var canGrab = grabSkill.IsGrabbing && _staminaLookup.UseStamina("Grabbing");
-        MovementStates currentMovementState;
-
-        if (canSprint && _maySprint) currentMovementState = MovementStates.Sprinting;
-        else if (!_maySprint) currentMovementState = MovementStates.Exhausted;
-        else currentMovementState = MovementStates.Walking;
-
-        playerMovement.currentMovementState = currentMovementState;
-        if (comboSystem == null || !comboSystem.InCombo || !CannotMove) playerMovement.Move(moveInput); 
+    if (targetSelector != null) TargetingStart(false);
+    
+    var isBlockingMovement = CannotMove || playerSpecialAbility != null && playerSpecialAbility.IsBlockingMovement;
+    if (isBlockingMovement)
+    {
+        if(CannotMove)playerMovement.currentMovementState = MovementStates.Walking; // todo: dit moet wat netter gemaakt worden.
+        return;
     }
+
+    Vector2 moveInput = _playerControlsActions["Move"].ReadValue<Vector2>();
+    var isSprinting = _playerControlsActions["SprintActivator"].ReadValue<float>() == 1 && moveInput.magnitude != 0;
+
+    var canSprint = isSprinting && _staminaLookup.UseStamina("Sprinting");
+    var canGrab = grabSkill.IsGrabbing && _staminaLookup.UseStamina("Grabbing");
+    MovementStates currentMovementState;
+
+    if (canSprint && _maySprint) currentMovementState = MovementStates.Sprinting;
+    else if (!_maySprint) currentMovementState = MovementStates.Exhausted;
+    else currentMovementState = MovementStates.Walking;
+
+    playerMovement.currentMovementState = currentMovementState;
+    if (comboSystem == null || !comboSystem.InCombo || !CannotMove) playerMovement.Move(moveInput);
 }
             </pre>
         </div>
@@ -182,51 +181,50 @@
         <div>
             <pre>private void FixedUpdate()
 {
-    if (isLocalPlayer)
+    if (!isLocalPlayer) return;
+    if (_isMovementDisabled) return;
+
+    CheckGroundState();
+
+    if (_shouldJump)
     {
-        if (_isMovementDisabled) return;
-    
-        CheckGroundState();
-    
-        if (_shouldJump)
+        _jumpDelayCounter++;
+        if (_jumpDelayCounter == _jumpDelay)
         {
-            _jumpDelayCounter++;
-            if (_jumpDelayCounter == _jumpDelay)
-            {
-                _jumpDelayCounter = 0;
-                _shouldJump = false;
-                Jump();
-            }
+            _jumpDelayCounter = 0;
+            _shouldJump = false;
+            Jump();
         }
-
-        if (MayJump()) StartJump();
-        else _jumpPrimed = false;
-
-        if (_isMoving) currentMoveDuration += Time.deltaTime;
-
-        CalculateVelocity();
-        UpdateAnimation(Mathf.Abs(_velocity.x));
-    
-        if (_isGrounded && _velocity.magnitude == 0 && _lastVelocity.magnitude > 0) onStopMoving?.Invoke();
-
-        if (_isGrounded && _velocity.magnitude > 0 && _lastVelocity.magnitude == 0) onStartMoving?.Invoke();
-
-        if (_isGrounded && _velocity.magnitude > 0) onGroundWalk?.Invoke();
-
-        if (_isGrounded)
-        {
-            IsJumping = false;
-            transform.rotation = Quaternion.Euler(0,0,0);
-        }
-
-        _lastVelocity = _velocity;
-        if (_velocity.x == 0)
-        {
-            ResetMoveDuration();
-            return;
-        }
-        UpdateMovement(_velocity);
     }
+
+    if (MayJump()) StartJump();
+    else _jumpPrimed = false;
+
+    if (_isMoving) currentMoveDuration += Time.deltaTime;
+
+    CalculateVelocity();
+    UpdateAnimation(Mathf.Abs(_velocity.x));
+
+    if (_isGrounded && _velocity.magnitude == 0 && _lastVelocity.magnitude > 0) AnimationStop0();
+
+    if (_isGrounded && _velocity.magnitude > 0 && _lastVelocity.magnitude == 0) onStartMoving?.Invoke();
+
+    if (_isGrounded && _velocity.magnitude > 0) AnimationSync0();
+
+
+    if (_isGrounded)
+    {
+        IsJumping = false;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
+    _lastVelocity = _velocity;
+    if (_velocity.x == 0)
+    {
+        ResetMoveDuration();
+        return;
+    }
+    UpdateMovement(_velocity);
 }
             </pre>
         </div>
@@ -279,16 +277,12 @@ void SyncSpecial(int layerIndex)
         <div>
             <pre>private void FixedUpdate()
 {
-    if (isLocalPlayer)
-    {
+    if (!isLocalPlayer)return;
+    if (_isGrounded && _velocity.magnitude == 0 && _lastVelocity.magnitude > 0) AnimationStop0();
 
-        if (_isGrounded && _velocity.magnitude == 0 && _lastVelocity.magnitude > 0) AnimationStop0();
+    if (_isGrounded && _velocity.magnitude > 0 && _lastVelocity.magnitude == 0) onStartMoving?.Invoke();
 
-        if (_isGrounded && _velocity.magnitude > 0 && _lastVelocity.magnitude == 0) onStartMoving?.Invoke();
-
-        if (_isGrounded && _velocity.magnitude > 0) AnimationSync0();
-
-    }
+    if (_isGrounded && _velocity.magnitude > 0) AnimationSync0();
 }
 [Command] void AnimationSync0() => AnimationSync();
 [ClientRpc] void AnimationSync() => onGroundWalk?.Invoke();
